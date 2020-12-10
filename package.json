@@ -1,0 +1,20 @@
+{
+  "name": "kekka",
+  "version": "0.0.1",
+  "description": "Result Monad adaptation for easy usage in JavaScript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apemb/kekka.git"
+  },
+  "homepage": "https://github.com/apemb/kekka",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive --exit "
+  },
+  "keywords": [
+    "Result",
+    "Monad"
+  ],
+  "author": "Antoine Boileau",
+  "license": "ISC"
+}

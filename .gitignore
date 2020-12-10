@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# IDE Files
+.idea
+.vscode
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.tgz
+
