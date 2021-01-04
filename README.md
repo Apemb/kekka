@@ -28,12 +28,20 @@ Ever heard about [Railway Programming ?](https://fsharpforfunandprofit.com/rop/)
 
 Wanting something like that in Javascript ? I did ! Enter the `Result` class.
 
-## Result class
+## Documentation
+
+- [Result Class](README.md#result-class)
+    - [Build a Result](README.md#build-a-result)
+    - [Check Result type](README.md#check-result-type)
+    - [Get the associated value](README.md#get-the-associated-value)
+    - [Work only on successful value](README.md#work-only-on-successful-value)
+
+### Result class
 
 A Result can be two things: either a Success (ie the happy path) or a Failure (something did not 
 go on the happy path, but not in a catastrophic way, more in a manageable way).
 
-### Build a Result
+#### Build a Result
 ```js
 // A success is an instance of the Result class build using the fromSuccess factory method
 const userResult = Result.fromSuccess(user)
@@ -46,7 +54,7 @@ const userResult = Result.fromFailure(new UserNotFoundError())
 const userResult = Failure(new UserNotFoundError())
 ``` 
 
-### Check Result type
+#### Check Result type
 
 One can check the result type by calling `isSuccess` or `isFailure` methods.
 ```js
@@ -61,7 +69,7 @@ failureResult.isSuccess() // false
 failureResult.isFailure() // true
 ``` 
 
-### Get the associated value
+#### Get the associated value
 
 One can want to get the associated value from the Result. Use `unwrap()` for that. `unwrap()` returns
 the associated value when successful and throws the associated error when a failure.
@@ -75,7 +83,7 @@ const failureResult = Result.fromFailure(new Error('failure'))
 successResult.unwrap() // throws error
 ``` 
 
-### Work only on successful value
+#### Work only on successful value
 
 To avoid unwrapping results every line, one can use the `.onSuccess` function.
 ```js
