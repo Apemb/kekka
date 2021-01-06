@@ -39,6 +39,8 @@ Wanting something like that in Javascript ? I did ! Enter the `Result` class.
     - [Configuration](README.md#configuration)
     - [thenOnSuccess and thenOnFailure](README.md#thenonsuccess-and-thenonfailure)
 
+There is a chai plugin available to make sweeter assertions: [chai-kekka](https://github.com/apemb/chai-kekka).
+
 ### Result class
 
 A Result can be two things: either a Success (ie the happy path) or a Failure (something did not 
