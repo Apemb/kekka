@@ -109,7 +109,7 @@ failureResult.onSuccess((successValue) => {
 ``` 
 A `.onFailure` function exists as well. Those functions take one argument, 
 a callback, that receives as first argument the associated value (success or failure)
-and returns a Success or Failure. The functions than returns a Result object, either
+and returns a Success or Failure. The functions then returns a Result object, either
 Success or Failure. For ease of use, if that callback returns any value other than a 
 Result object (even `undefined`) that value will be wrapped into a Success result.    
 
@@ -135,8 +135,8 @@ differently from errors. One can use `thenOnSuccess` and `thenOnFailure` to run 
 of the previous promise is a Result.Success or a Result.Failure. 
 
 Those functions will call the callback with the associated value of the result.
- If it is a `Success` than the next `thenOnSuccess` callback will be called with the result associated value as argument.
- If it is a `Failure` than the next `thenOnFailure` callback will be called with the result associated value as argument.
+ If it is a `Success` then the next `thenOnSuccess` callback will be called with the result associated value as argument.
+ If it is a `Failure` then the next `thenOnFailure` callback will be called with the result associated value as argument.
  
 ```js
 const successfulResult = Success('some value')
@@ -173,8 +173,8 @@ the callback that promise will be waited on before returning the resolved result
 the promise chain.
 
 Also it works as `onSuccess` and `onFailure` for the returned values that are not `Result`. If it is a `Success` or 
-a `Failure` than that is returned as is in the rest of the promise chain. But if the returned value of the callback is 
-not a `Result` than the value is wrapped in a `Success`.    
+a `Failure` then it is returned as it is in the rest of the promise chain. But if the returned value of the callback is 
+not a `Result` then the value is wrapped in a `Success`.    
 
 Thrown errors will still go to the next `catch` callback and will not be wrapped in any `Result`.
 
