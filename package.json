@@ -7,10 +7,12 @@
     "url": "https://github.com/apemb/kekka.git"
   },
   "homepage": "https://github.com/apemb/kekka",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.js",
   "scripts": {
     "lint": "eslint  src/**.js test/**.js --fix",
-    "test": "mocha --recursive --exit"
+    "test": "mocha --recursive --exit",
+    "build": "npx tsc"
   },
   "keywords": [
     "Result",
@@ -26,6 +28,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
-    "mocha": "^8.2.1"
+    "mocha": "^8.2.1",
+    "typescript": "^4.8.4"
   }
 }
