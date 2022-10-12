@@ -10,7 +10,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.js",
   "scripts": {
-    "lint": "eslint  src/**.js test/**.js --fix",
+    "lint": "eslint  src/**.ts --fix",
     "test": "mocha --recursive --exit",
     "build": "npx tsc"
   },
@@ -21,9 +21,11 @@
   "author": "Antoine Boileau",
   "license": "ISC",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "eslint": "^7.15.0",
+    "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
