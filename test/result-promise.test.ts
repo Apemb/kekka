@@ -1,10 +1,12 @@
-const { expect } = require('./test-helper')
-const { Result, Success, Failure } = require('../src/result')
-const { enableResultPromiseHelpers } = require('../src/result-promise')
-
-enableResultPromiseHelpers(Promise)
+import { expect } from './test-helper'
+import { Result, Success, Failure } from '../src/result'
+import { enableResultPromiseHelpers } from '../src/result-promise'
 
 describe('result promise', () => {
+  beforeEach(() => {
+    enableResultPromiseHelpers(Promise)
+  })
+
   describe('thenOnSuccess', () => {
     it('should run callback with unwrapped value if value passed is a success', () => {
       const value = 'some value'

@@ -1,5 +1,5 @@
-const { expect } = require('./test-helper')
-const { Result, Success, Failure } = require('../src/result')
+import { expect } from './test-helper'
+import { Result, Success, Failure } from '../src/result'
 
 describe('result', () => {
   describe('isSuccess', () => {
@@ -170,7 +170,7 @@ describe('result', () => {
 
       const returnedResult = failedResult.onFailure(receivedError => {
         return Result.fromFailure(
-          receivedError.message + ' is now failed again'
+            new Error(receivedError.message + ' is now failed again')
         )
       })
 
