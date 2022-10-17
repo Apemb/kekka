@@ -1,4 +1,4 @@
-import {Failure, Result, Success} from "./result";
+import { Failure, Result, Success } from "./result";
 
 declare global {
   interface Promise<T> {

@@ -13,5 +13,5 @@
     "declaration": true
   },
   "include": ["src", "index"],
-  "exclude": ["node_modules", "tests", "dist", ".idea"]
+  "exclude": ["node_modules", "test", "dist", ".idea"]
 }

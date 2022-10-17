@@ -3,17 +3,13 @@ import { Result, Success, Failure } from '../src/result'
 import('../src/result-promise-extension')
 
 describe('result promise', () => {
-  // beforeEach(() => {
-  //   enableResultPromiseHelpers(Promise)
-  // })
-
   describe('thenOnSuccess', () => {
     it('should run callback with unwrapped value if value passed is a success', () => {
       const value = 'some value'
       const successfulResult = Success(value)
 
       const promiseChain = Promise.resolve(successfulResult).thenOnSuccess(
-        sucessValue => Success(sucessValue + ' and more')
+        successValue => Success(successValue + ' and more')
       )
 
       return expect(promiseChain).to.eventually.be.an.instanceOf(Result)
@@ -25,8 +21,8 @@ describe('result promise', () => {
       const successfulResult = Success(value)
 
       const promiseChain = Promise.resolve(successfulResult).thenOnSuccess(
-        sucessValue => {
-          return Promise.resolve(sucessValue + ' and more')
+        successValue => {
+          return Promise.resolve(successValue + ' and more')
         }
       )
 
@@ -39,8 +35,8 @@ describe('result promise', () => {
       const failedResult = Failure(value)
 
       const promiseChain = Promise.resolve(failedResult).thenOnSuccess(
-        sucessValue => {
-          return Result.fromSuccess(sucessValue + ' and more')
+        successValue => {
+          return Result.fromSuccess(successValue + ' and more')
         }
       )
 
@@ -50,8 +46,8 @@ describe('result promise', () => {
 
     it('should not run callback if value passed is not a result object', () => {
       const promiseChain = Promise.resolve('Not a result').thenOnSuccess(
-        sucessValue => {
-          return Success(sucessValue + ' and more')
+        successValue => {
+          return Success(successValue + ' and more')
         }
       )
 
@@ -104,8 +100,8 @@ describe('result promise', () => {
 
     it('should not run callback if value passed is not a result object', () => {
       const promiseChain = Promise.resolve('Not a result').thenOnFailure(
-        sucessValue => {
-          return Success(sucessValue + ' and more')
+        successValue => {
+          return Success(successValue + ' and more')
         }
       )
 

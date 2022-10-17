@@ -127,7 +127,7 @@ describe('result', () => {
       const value = new Error('Some error')
       const failedResult = Failure(value)
 
-      const returnedResult = failedResult.onSuccess(receivedValue => {
+      const returnedResult = failedResult.onSuccess(() => {
         return Result.fromSuccess('Success')
       })
 
@@ -185,7 +185,7 @@ describe('result', () => {
       const value = 'some value'
       const successfulResult = Success(value)
 
-      const returnedResult = successfulResult.onFailure(receivedError => {
+      const returnedResult = successfulResult.onFailure(() => {
         return Result.fromSuccess('Success')
       })
 
