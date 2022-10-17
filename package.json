@@ -11,7 +11,7 @@
   "types": "dist/index.d.js",
   "scripts": {
     "lint": "eslint  src/**.ts test/**/ts --fix",
-    "test": "mocha --recursive --exit",
+    "test": "mocha --recursive --exit --require ts-node/register 'test/**/*.test.ts'",
     "build": "npx tsc"
   },
   "keywords": [

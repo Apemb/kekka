@@ -1,9 +1,8 @@
 import { Result, Success, Failure } from './src/result'
-import { enableResultPromiseHelpers } from './src/result-promise'
+import('./src/result-promise-extension')
 
 module.exports = {
   Result,
   Success,
   Failure,
-  enableResultPromiseHelpers
 }
