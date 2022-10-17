@@ -120,9 +120,9 @@ be monkey-pactched into the projet’s Promise class of choice. It is a purely o
 process. 
 
 #### Configuration
-To add helper function, the function enableResultPromiseHelpers must be called with the Promise object the project uses.
-Native Promise or other as Bluebird are that way supported. This function must be called at least once per project,
- and before any usage of the following asynchronous promise helper functions. 
+To add with the following asynchronous promise helper functions, the package must just be required when starting the project.
+That way, native Promise will be embellished with those functions.
+This package must be called at least once per project, and before any usage of the following asynchronous promise helper functions. 
  
 ```js
 enableResultPromiseHelpers(Promise)
