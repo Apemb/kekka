@@ -9,6 +9,9 @@
   "homepage": "https://github.com/apemb/kekka",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "lint": "eslint  src/**.ts test/**.ts --fix",
     "test": "mocha --recursive --exit --require ts-node/register 'test/**/*.test.ts'",

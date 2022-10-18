@@ -28,6 +28,13 @@ Ever heard about [Railway Programming ?](https://fsharpforfunandprofit.com/rop/)
 
 Wanting something like that in Javascript ? I did ! Enter the `Result` class.
 
+## Changelog
+
+- v2.0: Transcription to Typescript
+  - Typescript Types
+  - Suppression of enableResultPromiseHelpers function
+  - Removal of support for non-native promises
+
 ## Documentation
 
 - [Result Class](README.md#result-class)
@@ -124,10 +131,6 @@ To add with the following asynchronous promise helper functions, the package mus
 That way, native Promise will be embellished with those functions.
 This package must be called at least once per project, and before any usage of the following asynchronous promise helper functions. 
  
-```js
-enableResultPromiseHelpers(Promise)
-``` 
-
 #### thenOnSuccess and thenOnFailure
 
 To keep the three way flow - happy path, business failure, unexpected error - Successes and Failures are to be treated
