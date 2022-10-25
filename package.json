@@ -1,6 +1,6 @@
 {
   "name": "kekka",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Result Monad adaptation for easy usage in JavaScript",
   "repository": {
     "type": "git",

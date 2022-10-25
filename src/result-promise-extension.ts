@@ -1,16 +1,18 @@
-import { Failure, Result, Success } from "./result";
+import {Failure, Result, Success} from "./result";
+
+type promiseSuccessCallback<T, U> = (value: T) => U | Result<U> | Promise<Result<U>>
 
 declare global {
   interface Promise<T> {
-    thenOnSuccess<NextValue>(callback: (value: T) => NextValue | Result<NextValue> | Promise<Result<NextValue>>): Promise<T> | Promise<Result<NextValue>>
+    thenOnSuccess<U>(callback: T extends Result<infer V> ? promiseSuccessCallback<V, U> : promiseSuccessCallback<unknown, U>): T extends Result<unknown> ? Promise<Result<U>> : Promise<T>
 
-    thenOnFailure<NextValue>(callback: (value: Error) => NextValue | Result<NextValue> | Promise<Result<NextValue>>): Promise<T> | Promise<Result<NextValue>>
+    thenOnFailure<U>(callback: (value: Error) => U | Result<U> | Promise<Result<U>>): Promise<T> | Promise<Result<U>>
   }
 
   interface PromiseConstructor {
-    resolveFromSuccess<Value>(value: Value): Promise<Result<Value>>
+    resolveFromSuccess<U>(value: U): Promise<Result<U>>
 
-    resolveFromFailure<Value>(value: Error): Promise<Result<Value>>
+    resolveFromFailure<U>(value: Error): Promise<Result<U>>
   }
 }
 
@@ -30,7 +32,7 @@ const wrapValueInResultAsync = function <Value>(value: Value | Result<Value> | P
 }
 
 
-Promise.prototype.thenOnSuccess = function <T, NextValue>(callback: (value: T) => NextValue | Result<NextValue> | Promise<Result<NextValue>>): Promise<T> | Promise<Result<NextValue>> {
+Promise.prototype.thenOnSuccess = function (callback) {
   return this.then((promiseReturnedValue) => {
     if (promiseReturnedValue instanceof Result && promiseReturnedValue.isSuccess()) {
       return wrapValueInResultAsync(callback(promiseReturnedValue.unwrap()))
@@ -40,7 +42,7 @@ Promise.prototype.thenOnSuccess = function <T, NextValue>(callback: (value: T) =
   })
 }
 
-Promise.prototype.thenOnFailure = function <T, NextValue>(callback: (value: Error) => NextValue | Result<NextValue> | Promise<Result<NextValue>>): Promise<T> | Promise<Result<NextValue>> {
+Promise.prototype.thenOnFailure = function (callback) {
   return this.then((promiseReturnedValue) => {
     if (promiseReturnedValue instanceof Result && promiseReturnedValue.isFailure()) {
       return wrapValueInResultAsync(callback(promiseReturnedValue.value))

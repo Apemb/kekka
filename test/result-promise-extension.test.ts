@@ -1,5 +1,6 @@
-import { expect } from './test-helper'
-import { Result, Success, Failure } from '../src/result'
+import {expect} from './test-helper'
+import {Result, Success, Failure} from '../src/result'
+
 import('../src/result-promise-extension')
 
 describe('result promise', () => {
@@ -8,7 +9,7 @@ describe('result promise', () => {
       const value = 'some value'
       const successfulResult = Success(value)
 
-      const promiseChain = Promise.resolve(successfulResult).thenOnSuccess(
+      const promiseChain: Promise<Result<string>> = Promise.resolve(successfulResult).thenOnSuccess(
         successValue => Success(successValue + ' and more')
       )
 
@@ -32,9 +33,9 @@ describe('result promise', () => {
 
     it('should not run callback if value passed is a failure', () => {
       const value = new Error('Some error')
-      const failedResult = Failure(value)
+      const failedResult = Failure<string>(value)
 
-      const promiseChain = Promise.resolve(failedResult).thenOnSuccess(
+      const promiseChain: Promise<Result<string>> = Promise.resolve(failedResult).thenOnSuccess(
         successValue => {
           return Result.fromSuccess(successValue + ' and more')
         }
@@ -45,11 +46,11 @@ describe('result promise', () => {
     })
 
     it('should not run callback if value passed is not a result object', () => {
-      const promiseChain = Promise.resolve('Not a result').thenOnSuccess(
-        successValue => {
-          return Success(successValue + ' and more')
-        }
-      )
+      const promiseChain: Promise<string> =
+        Promise.resolve('Not a result')
+          .thenOnSuccess(successValue => {
+            return Success(successValue + ' and more')
+          })
 
       return expect(promiseChain).to.eventually.not.be.an.instanceOf(Result)
     })
@@ -60,11 +61,10 @@ describe('result promise', () => {
       const value = new Error('Some error')
       const failedResult = Failure(value)
 
-      const promiseChain = Promise.resolve(failedResult).thenOnFailure(
-        receivedError => {
+      const promiseChain = Promise.resolve(failedResult)
+        .thenOnFailure(receivedError => {
           return Success(receivedError.message + ' is now saved')
-        }
-      )
+        })
 
       return expect(promiseChain).to.eventually.be.an.instanceOf(Result)
         .and.to.deep.equal(Success('Some error is now saved'))
@@ -74,11 +74,10 @@ describe('result promise', () => {
       const value = new Error('Some error')
       const failedResult = Result.fromFailure(value)
 
-      const promiseChain = Promise.resolve(failedResult).thenOnFailure(
-        receivedError => {
+      const promiseChain = Promise.resolve(failedResult)
+        .thenOnFailure(receivedError => {
           return Promise.resolve(receivedError.message + ' is now saved')
-        }
-      )
+        })
 
       return expect(promiseChain).to.eventually.be.an.instanceOf(Result)
         .and.to.deep.equal(Success('Some error is now saved'))
@@ -88,22 +87,20 @@ describe('result promise', () => {
       const value = 'some value'
       const successfulResult = Result.fromSuccess(value)
 
-      const promiseChain = Promise.resolve(successfulResult).thenOnFailure(
-        receivedError => {
+      const promiseChain = Promise.resolve(successfulResult)
+        .thenOnFailure(receivedError => {
           return Result.fromSuccess(receivedError.message + ' is now saved')
-        }
-      )
+        })
 
       return expect(promiseChain).to.eventually.be.an.instanceOf(Result)
         .and.to.deep.equal(Success(value))
     })
 
     it('should not run callback if value passed is not a result object', () => {
-      const promiseChain = Promise.resolve('Not a result').thenOnFailure(
-        successValue => {
+      const promiseChain = Promise.resolve('Not a result')
+        .thenOnFailure(successValue => {
           return Success(successValue + ' and more')
-        }
-      )
+        })
 
       return expect(promiseChain).to.eventually.not.be.an.instanceOf(Result)
     })
