@@ -7,14 +7,14 @@ export class Result<Value> {
   public static readonly TYPE = TYPE
 
   private type: TYPE
-  private _value: Value | Error
+  private _value?: Value | Error
 
-  constructor ({ type, value }: { type: TYPE, value: Value | Error }) {
+  constructor ({ type, value }: { type: TYPE, value?: Value | Error }) {
     this.type = type
     this._value = value
   }
 
-  static fromSuccess<NewValue> (value: NewValue): Result<NewValue> {
+  static fromSuccess<NewValue> (value?: NewValue): Result<NewValue> {
     return new Result({ type: TYPE.SUCCESS, value: value })
   }
 
@@ -96,8 +96,8 @@ export class Result<Value> {
     return this.toString()
   }
 
-  get value(): Error | Value {
-    return this._value;
+  get value(): Error | Value | undefined {
+    return this._value
   }
 }
 
