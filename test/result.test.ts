@@ -42,6 +42,12 @@ describe('result', () => {
       expect(successfulResult.unwrap()).to.equal(value)
     })
 
+    it('should return undefined if result is a success without any value', () => {
+      const successfulResult = Success()
+
+      expect(successfulResult.unwrap()).to.equal(undefined)
+    })
+
     it('should throw the failure error if result is a failure', () => {
       const value = new Error('Some error')
       const failedResult = Failure(value)

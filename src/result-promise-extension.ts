@@ -10,7 +10,7 @@ declare global {
   }
 
   interface PromiseConstructor {
-    resolveFromSuccess<U>(value: U): Promise<Result<U>>
+    resolveFromSuccess<U>(value?: U): Promise<Result<U | undefined>>
 
     resolveFromFailure<U>(value: Error): Promise<Result<U>>
   }
@@ -52,7 +52,7 @@ Promise.prototype.thenOnFailure = function (callback) {
   })
 }
 
-Promise.resolveFromSuccess = function <Value>(value: Value): Promise<Result<Value>> {
+Promise.resolveFromSuccess = function <Value>(value: Value): Promise<Result<Value | undefined>> {
   return Promise.resolve(Success(value))
 }
 
