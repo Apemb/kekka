@@ -113,7 +113,7 @@ export class Result<Value> {
 }
 
 export function isResult(obj: any | null | undefined): obj is Result<never> {
-  return obj.kekkaPublicApiVersion === KEKKA_API_VERSION
+  return !(obj === undefined || obj === null) && obj.kekkaPublicApiVersion === KEKKA_API_VERSION
 }
 
 export const Success = Result.fromSuccess

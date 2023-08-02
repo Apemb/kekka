@@ -1,5 +1,5 @@
 import { expect } from './test-helper'
-import { Result, Success, Failure } from '../src/result'
+import { Result, Success, Failure, isResult } from '../src/result'
 
 describe('result', () => {
   describe('isSuccess', () => {
@@ -198,5 +198,46 @@ describe('result', () => {
       expect(returnedResult.isSuccess()).to.be.true
       expect(returnedResult.unwrap()).to.equal(value)
     })
+  })
+})
+
+describe('isResult', () => {
+  it('should be true if obj is a success', () => {
+    const value = 'some value'
+    const successfulResult = Success(value)
+
+    expect(isResult(successfulResult)).to.be.true
+  })
+
+  it('should be true if obj is a failure', () => {
+    const value = new Error('Some error')
+    const failedResult = Failure(value)
+
+    expect(isResult(failedResult)).to.be.true
+  })
+
+
+  it('should be false if obj is not a result', () => {
+    const someObject = {a: 'test'}
+
+    expect(isResult(someObject)).to.be.false
+  })
+
+  it('should be false if obj is a string or an integer', () => {
+    expect(isResult('a string')).to.be.false
+    expect(isResult(31)).to.be.false
+  })
+
+  it('should be false if obj is a bool', () => {
+    expect(isResult(true)).to.be.false
+    expect(isResult(false)).to.be.false
+  })
+
+  it('should be false if value is undefined', () => {
+    expect(isResult(undefined)).to.be.false
+  })
+
+  it('should be false if value is null', () => {
+    expect(isResult(null)).to.be.false
   })
 })
