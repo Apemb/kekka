@@ -105,7 +105,7 @@ const successResult = Result.fromSuccess('a success')
 successResult.onSuccess((successValue) => {
   // successValue > 'a success'
   return Result.fromSuccess('another success')
-}) // returns Result.Success with ('a success') associated value
+}) // returns Result.Success with ('another success') associated value
 
 const failureResult = Result.fromFailure(new Error('failure'))
 

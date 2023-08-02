@@ -1,3 +1,9 @@
+/**
+ * Instead of relying on `result instanceof Result` Kekka will rely on KEKKA_API_VERSION to determine if the
+ * object is a Result object and can be processed as such.
+ */
+const KEKKA_API_VERSION = 2
+
 enum TYPE {
   SUCCESS = 'SUCCESS',
   FAILURE = 'FAILURE'
@@ -5,9 +11,10 @@ enum TYPE {
 
 export class Result<Value> {
   public static readonly TYPE = TYPE
+  public static readonly kekkaPublicApiVersion = KEKKA_API_VERSION
 
-  private type: TYPE
-  private _value?: Value | Error
+  private readonly type: TYPE
+  private readonly _value?: Value | Error
 
   constructor ({ type, value }: { type: TYPE, value?: Value | Error }) {
     this.type = type
@@ -58,10 +65,10 @@ export class Result<Value> {
     if (this.isSuccess()) {
       const returnedValue: NextValue | Result<NextValue> = callback(this._value as Value)
 
-      if (returnedValue instanceof Result) {
+      if (isResult(returnedValue)) {
         return returnedValue
       } else {
-        return Result.fromSuccess(returnedValue)
+        return Result.fromSuccess(returnedValue as NextValue)
       }
     } else {
       return this
@@ -72,10 +79,10 @@ export class Result<Value> {
     if (this.isFailure()) {
       const returnedValue: NextValue | Result<NextValue> = callback(this._value as Error)
 
-      if (returnedValue instanceof Result) {
+      if (isResult(returnedValue)) {
         return returnedValue
       } else {
-        return Result.fromSuccess(returnedValue)
+        return Result.fromSuccess(returnedValue as NextValue)
       }
     } else {
       return this
@@ -96,9 +103,17 @@ export class Result<Value> {
     return this.toString()
   }
 
+  get kekkaPublicApiVersion (): number {
+    return KEKKA_API_VERSION
+  }
+
   get value(): Error | Value | undefined {
     return this._value
   }
+}
+
+export function isResult(obj: any | null | undefined): obj is Result<never> {
+  return obj.kekkaPublicApiVersion === KEKKA_API_VERSION
 }
 
 export const Success = Result.fromSuccess

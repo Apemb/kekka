@@ -1,4 +1,4 @@
-import {Failure, Result, Success} from "./result";
+import {Failure, isResult, Result, Success} from './result'
 
 type promiseSuccessCallback<T, U> = (value: T) => U | Result<U> | Promise<Result<U>>
 
@@ -17,7 +17,7 @@ declare global {
 }
 
 const wrapValueInResult = function <Value>(value: Value | Result<Value>): Result<Value> {
-  if (value instanceof Result) {
+  if (isResult(value)) {
     return value as Result<Value>
   } else {
     return Success(value) as Result<Value>
@@ -34,7 +34,7 @@ const wrapValueInResultAsync = function <Value>(value: Value | Result<Value> | P
 
 Promise.prototype.thenOnSuccess = function (callback) {
   return this.then((promiseReturnedValue) => {
-    if (promiseReturnedValue instanceof Result && promiseReturnedValue.isSuccess()) {
+    if (isResult(promiseReturnedValue) && promiseReturnedValue.isSuccess()) {
       return wrapValueInResultAsync(callback(promiseReturnedValue.unwrap()))
     } else {
       return promiseReturnedValue
@@ -44,8 +44,8 @@ Promise.prototype.thenOnSuccess = function (callback) {
 
 Promise.prototype.thenOnFailure = function (callback) {
   return this.then((promiseReturnedValue) => {
-    if (promiseReturnedValue instanceof Result && promiseReturnedValue.isFailure()) {
-      return wrapValueInResultAsync(callback(promiseReturnedValue.value))
+    if (isResult(promiseReturnedValue) && promiseReturnedValue.isFailure()) {
+      return wrapValueInResultAsync(callback(promiseReturnedValue.value as Error))
     } else {
       return promiseReturnedValue
     }
