@@ -1,5 +1,5 @@
 /**
- * Instead of relying on `result instanceof Result` Kekka will rely on KEKKA_PUBLIC_API_VERSION to determine if the
+ * Instead of relying on `result instanceof Result` Kekka will rely on KEKKA_API_VERSION to determine if the
  * object is a Result object and can be processed as such.
  */
 const KEKKA_API_VERSION = 2
@@ -11,7 +11,7 @@ enum TYPE {
 
 export class Result<Value> {
   public static readonly TYPE = TYPE
-  public static readonly KEKKA_PUBLIC_API_VERSION = KEKKA_API_VERSION
+  public static readonly kekkaPublicApiVersion = KEKKA_API_VERSION
 
   private readonly type: TYPE
   private readonly _value?: Value | Error
@@ -103,7 +103,7 @@ export class Result<Value> {
     return this.toString()
   }
 
-  get KEKKA_PUBLIC_API_VERSION (): number {
+  get kekkaPublicApiVersion (): number {
     return KEKKA_API_VERSION
   }
 
@@ -112,8 +112,8 @@ export class Result<Value> {
   }
 }
 
-export function isResult(obj: any): obj is Result<never> {
-  return obj.KEKKA_PUBLIC_API_VERSION === KEKKA_API_VERSION
+export function isResult(obj: any | null | undefined): obj is Result<never> {
+  return obj.kekkaPublicApiVersion === KEKKA_API_VERSION
 }
 
 export const Success = Result.fromSuccess
