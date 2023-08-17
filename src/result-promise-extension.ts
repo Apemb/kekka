@@ -31,7 +31,6 @@ const wrapValueInResultAsync = function <Value>(value: Value | Result<Value> | P
   }
 }
 
-
 Promise.prototype.thenOnSuccess = function (callback) {
   return this.then((promiseReturnedValue) => {
     if (isResult(promiseReturnedValue) && promiseReturnedValue.isSuccess()) {
