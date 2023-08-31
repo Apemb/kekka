@@ -1,6 +1,5 @@
 import { expect } from './test-helper'
 import {Empty, isOptional, Optional, Some} from '../src/optional'
-import { Success, Failure, isResult } from '../src/result'
 
 describe('Optional', () => {
 
@@ -14,14 +13,14 @@ describe('Optional', () => {
 
     it('should return an empty optional if value is undefined', () => {
       const value = undefined
-      const optional = Optional.ofNullable(value)
+      const optional = Optional.ofNullable<string>(value)
 
       expect(optional.isSome()).to.be.false
     })
 
     it('should return an empty optional if value is null', () => {
       const value = null
-      const optional = Optional.ofNullable(value)
+      const optional = Optional.ofNullable<string>(value)
 
       expect(optional.isSome()).to.be.false
     })
@@ -36,7 +35,7 @@ describe('Optional', () => {
     })
 
     it('should be false if optional is empty', () => {
-      const empty = Empty()
+      const empty = Empty<string>()
 
       expect(empty.isSome()).to.be.false
     })
@@ -51,7 +50,7 @@ describe('Optional', () => {
     })
 
     it('should be true if optional is empty', () => {
-      const empty = Empty()
+      const empty = Empty<string>()
 
       expect(empty.isEmpty()).to.be.true
     })
@@ -67,7 +66,7 @@ describe('Optional', () => {
     })
 
     it('should return function argument if optional is empty', () => {
-      const empty = Empty()
+      const empty = Empty<string>()
 
       const backupValue = 'other value'
       expect(empty.orElse(backupValue)).to.equal(backupValue)
@@ -75,19 +74,19 @@ describe('Optional', () => {
   })
 
   describe('orElseGet', () => {
-    it('should return associated value if optional has some value', () => {
+    it('should return Promise with associated value if optional has some value', () => {
       const value = 'some value'
       const some = Some(value)
 
       const backupValue = 'other value'
-      expect(some.orElseGet(() => backupValue)).to.equal(value)
+      expect(some.orElseGet(() => Promise.resolve(backupValue))).to.eventually.equal(value)
     })
 
     it('should return function return value if optional is empty', () => {
-      const empty = Empty()
+      const empty = Empty<string>()
 
       const backupValue = 'other value'
-      expect(empty.orElseGet(() => backupValue)).to.equal(backupValue)
+      expect(empty.orElseGet(() => Promise.resolve(backupValue))).to.eventually.equal(backupValue)
     })
   })
 
@@ -101,7 +100,7 @@ describe('Optional', () => {
     })
 
     it('should throw error if optional is empty', () => {
-      const empty = Empty()
+      const empty = Empty<string>()
 
       const error = new Error('some error')
       expect(() => empty.orElseThrow(error)).to.throw(error)
@@ -180,43 +179,42 @@ describe('Optional', () => {
   })
 })
 
-xdescribe('isOptional', () => {
-  it('should be true if obj is a success', () => {
+describe('isOptional', () => {
+  it('should be true if obj is an optional with value', () => {
     const value = 'some value'
-    const successfulResult = Success(value)
+    const optional = Some(value)
 
-    expect(isResult(successfulResult)).to.be.true
+    expect(isOptional(optional)).to.be.true
   })
 
-  it('should be true if obj is a failure', () => {
-    const value = new Error('Some error')
-    const failedResult = Failure(value)
+  it('should be true if obj is an empty optional', () => {
+    const emptyOptional = Empty<string>()
 
-    expect(isResult(failedResult)).to.be.true
+    expect(isOptional(emptyOptional)).to.be.true
   })
 
 
-  it('should be false if obj is not a result', () => {
+  it('should be false if obj is not an optional', () => {
     const someObject = {a: 'test'}
 
-    expect(isResult(someObject)).to.be.false
+    expect(isOptional(someObject)).to.be.false
   })
 
   it('should be false if obj is a string or an integer', () => {
-    expect(isResult('a string')).to.be.false
-    expect(isResult(31)).to.be.false
+    expect(isOptional('a string')).to.be.false
+    expect(isOptional(31)).to.be.false
   })
 
   it('should be false if obj is a bool', () => {
-    expect(isResult(true)).to.be.false
-    expect(isResult(false)).to.be.false
+    expect(isOptional(true)).to.be.false
+    expect(isOptional(false)).to.be.false
   })
 
   it('should be false if value is undefined', () => {
-    expect(isResult(undefined)).to.be.false
+    expect(isOptional(undefined)).to.be.false
   })
 
   it('should be false if value is null', () => {
-    expect(isResult(null)).to.be.false
+    expect(isOptional(null)).to.be.false
   })
 })

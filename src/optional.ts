@@ -57,9 +57,9 @@ export class Optional<Value> {
     }
   }
 
-  orElseGet(callback: () => Value): Value {
+  orElseGet(callback: () => Promise<Value>): Promise<Value> {
     if (this.isSome()) {
-      return this._value as Value
+      return Promise.resolve(this._value as Value)
     } else {
       return callback()
     }
