@@ -1,13 +1,13 @@
 # Optional Object Documentation
 
-- [Result Class](result.md#result-class)
-    - [Build a Result](result.md#build-a-result)
-    - [Check Result type](result.md#check-result-type)
-    - [Get the associated value](result.md#get-the-associated-value)
-    - [Work only on successful value](result.md#work-only-on-successful-value)
-- [Using with promises](result.md#using-with-promises)
-    - [Configuration](result.md#configuration)
-    - [thenOnSuccess and thenOnFailure](result.md#thenonsuccess-and-thenonfailure)
+- [Optional Class](optional.md#optional-class)
+    - [Build an Optional](optional.md#build-an-optional)
+    - [Check Optional state](optional.md#check-optional-state)
+    - [Unwrap the optional value](optional.md#unwrap-the-optional-value)
+    - [Work only if optional has value](optional.md#work-only-if-optional-has-value)
+- [Using with Result Objects](optional.md#using-with-result-objects)
+    - [Optional.toResult](optional.md#optionaltoresult)
+    - [Result.toOptional](optional.md#resulttooptional)
 
 ## Optional class
 
@@ -85,126 +85,52 @@ const value6 = emptyOptional.orElseThrow(error) // Error('the optional was empty
 To avoid unwrapping results every line, one can use the `.map` function.
 
 ```ts
-const successResult = Result.fromSuccess('a success')
+const filledOptional = Optional.some('a value')
+filledOptional.map((value) => { // value > 'a value'
+  return 'another value'
+}) // returns Optional.some('another value')
 
-successResult.onSuccess((successValue) => {
-  // successValue > 'a success'
-  return Result.fromSuccess('another success')
-}) // returns Result.Success with ('another success') associated value
-
-const failureResult = Result.fromFailure(new Error('failure'))
-
-failureResult.onSuccess((successValue) => {
-  // Will not be called
-  return Result.fromSuccess('another success')
-}) // Result.Failure with (Error('failure')) associated valued
+const emptyOptional = Optional.empty<string>()
+emptyOptional.map((value) => { // value > 'a value'
+  return 'another value'
+}) // returns Optional.empty()
 ``` 
 
-## Using with promises
+## Using with Result Objects
 
-In javascript, most actions are asynchronous. To ease the usage of the result object, helpers can
-be monkey-pactched into the projet’s Promise class of choice. It is a purely opt-in
-process. 
+It is often useful to switch from Optional to Result objects and vice versa.
 
-### Configuration
-To add with the following asynchronous promise helper functions, the package must just be required when starting the project.
-That way, native Promise will be embellished with those functions.
-This package must be called at least once per project, and before any usage of the following asynchronous promise helper functions. 
- 
-### thenOnSuccess and thenOnFailure
+### Optional.toResult
 
-To keep the three way flow - happy path, business failure, unexpected error - Successes and Failures are to be treated
-differently from errors. One can use `thenOnSuccess` and `thenOnFailure` to run callbacks only if the result
-of the previous promise is a Result.Success or a Result.Failure. 
+One can convert an Optional to a Result with the `toResult` function.
+If the Optional is empty then the Result will be a Failure with the error passed as parameter. 
+If the Optional has an associated value then the Result will be a Success with the associated value.
 
-Those functions will call the callback with the associated value of the result.
- If it is a `Success` then the next `thenOnSuccess` callback will be called with the result associated value as argument.
- If it is a `Failure` then the next `thenOnFailure` callback will be called with the result associated value as argument.
- 
-```js
-const successfulResult = Success('some value')
-const failureResult = Failure(new Error('failure'))
-const nonResultValue = 34243
+```ts
+const filledOptional = Optional.some('a value')
+filledOptional.toResult(new Error('a failure')) // returns Result.Success('a value')
 
-Promise.resolve(successfulResult)
-  .thenOnSuccess(sucessValue => { // Will be called
-    return Success(sucessValue + ' and more')
-  }) 
-  .thenOnFailure(associatedError => { // Will not be called
-    return Success('Return from error')
-  }) 
-  // will return a promise that will resolve Result.Success('some value and more')
-
-
-Promise.resolve(failureResult)
-  .thenOnSuccess(sucessValue => { // Will not be called
-    return Success(sucessValue + ' and more')
-  })
-  .thenOnFailure(associatedError => { // Will be called
-    return Failure(new Error('another failure'))
-  })
- // will return a promise that will resolve Failure(new Error('another failure'))
-
-Promise.resolve(nonResultValue)
-  .thenOnSuccess(sucessValue => { // Will never be called
-    return Success(sucessValue + ' and more')
-  }) // will return a promise that will resolve nonResultValue
+const emptyOptional = Optional.empty<string>()
+emptyOptional.toResult(new Error('a failure')) // returns Result.Failure(new Error('a failure'))
 ```
 
-The functions `thenOnSuccess` and `thenOnFailure` work as promises in the way that if you return a promise in 
-the callback that promise will be waited on before returning the resolved result as the argument of the rest of
-the promise chain.
+### Result.toOptional
 
-Also it works as `onSuccess` and `onFailure` for the returned values that are not `Result`. If it is a `Success` or 
-a `Failure` then it is returned as it is in the rest of the promise chain. But if the returned value of the callback is 
-not a `Result` then the value is wrapped in a `Success`.    
+One can convert a Result to an Optional with the `toOptional` function.
+If the Result is a Success then the Optional will be Some with the associated value.
+If the Result is a Failure then the Optional will be Empty.
 
-Thrown errors will still go to the next `catch` callback and will not be wrapped in any `Result`.
+```ts
+const successResult = Result.fromSuccess('a value')
+successResult.toOptional() // returns Optional.some('a value')
 
-```js
-Promise.resolve(Success('some value'))
-  .thenOnSuccess(sucessValue => { 
-    return 'Some string'
-  }) 
-  .then(arg => { 
-    // Will be called
-    // arg will be a Result.Success with 'Some string' as associated value
-  }) 
-
-Promise.resolve(Success('some value'))
-  .thenOnSuccess(sucessValue => { // Will not be called
-    return Failure(new Error('a failure'))
-  })
-  .then(arg => { 
-    // Will be called
-    // arg will be a Result.Failure with new Error('a failure') as associated value
-  })
-
-Promise.resolve(Success('some value'))
-  .thenOnSuccess(sucessValue => { // Will not be called
-    const anObject = {a: 42}
-    return Promise.resolve(anObject)
-  })
-  .then(arg => { 
-    // Will be called
-    // arg will be a Result.Success with anObject as associated value
-  })
-
-
-Promise.resolve(nonResultValue)
-  .thenOnSuccess(sucessValue => { // Will never be called
-    throw new Error('thrown erre')
-  })
-  .then(arg => { 
-    // Will not be called
-  })
-  .catch(error => {
-    // Will be called with new Error('thrown erre')
-  })
+const failureResult = Result.fromFailure(new Error('a failure'))
+failureResult.toOptional() // returns Optional.empty()
 ```
 
-### resolveFromSuccess and resolveFromFailure
+On the special cases where the result is a success with an undefined or null value, the optional will be empty.
 
-For ease of usage `Promise.resolve(Success(value))` can be written `Promise.resolveFromSuccess(value)`. 
-The same things exists for `Promise.resolve(Failure(error))` as `Promise.resolveFromFailure(error)`
-
+```ts
+const successResult = Result.fromSuccess(undefined)
+successResult.toOptional() // returns Optional.empty()
+```
