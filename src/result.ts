@@ -2,7 +2,7 @@
  * Instead of relying on `result instanceof Result` Kekka will rely on KEKKA_API_VERSION to determine if the
  * object is a Result object and can be processed as such.
  */
-const KEKKA_API_VERSION = 3
+const KEKKA_API_VERSION = 4
 
 enum TYPE {
   SUCCESS = 'SUCCESS',
@@ -16,7 +16,7 @@ export class Result<Value> {
   private readonly type: TYPE
   private readonly _value?: Value | Error
 
-  constructor ({ type, value }: { type: TYPE, value?: Value | Error }) {
+  private constructor ({ type, value }: { type: TYPE, value?: Value | Error }) {
     this.type = type
     this._value = value
   }
