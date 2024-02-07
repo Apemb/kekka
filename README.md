@@ -74,13 +74,13 @@ Result Object Documentation
     - [thenOnSuccess and thenOnFailure](docs/result.md#thenonsuccess-and-thenonfailure)
 
 Optional Object Documentation
-- [Optional Class](optional.md#optional-class)
-  - [Build an Optional](optional.md#build-an-optional)
-  - [Check Optional state](optional.md#check-optional-state)
-  - [Unwrap the optional value](optional.md#unwrap-the-optional-value)
-  - [Work only if optional has value](optional.md#work-only-if-optional-has-value)
-- [Using with Result Objects](optional.md#using-with-result-objects)
-  - [Optional.toResult](optional.md#optionaltoresult)
-  - [Result.toOptional](optional.md#resulttooptional)
+- [Optional Class](docs/optional.md#optional-class)
+  - [Build an Optional](docs/optional.md#build-an-optional)
+  - [Check Optional state](docs/optional.md#check-optional-state)
+  - [Unwrap the optional value](docs/optional.md#unwrap-the-optional-value)
+  - [Work only if optional has value](docs/optional.md#work-only-if-optional-has-value)
+- [Using with Result Objects](docs/optional.md#using-with-result-objects)
+  - [Optional.toResult](docs/optional.md#optionaltoresult)
+  - [Result.toOptional](docs/optional.md#resulttooptional)
 
 There is a chai plugin available to make sweeter assertions: [chai-kekka](https://github.com/apemb/chai-kekka).
