@@ -16,7 +16,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "lint": "eslint  src/**.ts test/**.ts --fix",
+    "lint": "eslint . --fix",
     "test": "mocha --recursive --exit --node-option import=tsx --extension ts 'test/**/*.test.ts'",
     "build": "npx tsc",
     "prepublishOnly": "npm run build && npm test"
@@ -32,17 +32,12 @@
     "@types/chai-as-promised": "^8.0.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.1.1",
-    "@typescript-eslint/eslint-plugin": "^8.63.0",
-    "@typescript-eslint/parser": "^8.63.0",
     "chai": "^6.2.2",
     "chai-as-promised": "^8.0.2",
-    "eslint": "^8.57.1",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.6.0",
+    "eslint": "^10.7.0",
     "mocha": "^11.7.6",
     "tsx": "^4.23.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.63.0"
   }
 }

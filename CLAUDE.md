@@ -45,5 +45,5 @@ These methods are declared to TypeScript via `declare module` / `declare global`
 
 ## Testing conventions
 - Mocha + Chai (`expect` BDD style) + `chai-as-promised`, wired in `test/test-helper.ts`. Chai 6 is ESM-only with named exports — import as `import { use, expect } from 'chai'`, not a default import.
-- Chai assertions like `expect(x).to.be.true` are property expressions, so `test/.eslintrc` disables both `no-unused-expressions` and `@typescript-eslint/no-unused-expressions`.
+- Chai assertions like `expect(x).to.be.true` are property expressions, so the `test/**/*.ts` override in `eslint.config.mjs` (flat config, ESLint 10) disables both `no-unused-expressions` and `@typescript-eslint/no-unused-expressions`.
 - Tests that exercise the side-effect extensions must load them with a **static** side-effect import (`import '../src/result-promise-extension'`), never a floating `import(...)` — under `tsx` the dynamic form resolves too late and the prototype patch isn't applied when the test runs.
