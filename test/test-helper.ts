@@ -1,8 +1,8 @@
 process.env.NODE_ENV = 'test'
 
-import chai from 'chai'
+import { use, expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
-export const expect = chai.expect
+export { expect }

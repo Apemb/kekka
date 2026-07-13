@@ -17,7 +17,7 @@
   },
   "scripts": {
     "lint": "eslint  src/**.ts test/**.ts --fix",
-    "test": "mocha --recursive --exit --require tsx/cjs 'test/**/*.test.ts'",
+    "test": "mocha --recursive --exit --node-option import=tsx --extension ts 'test/**/*.test.ts'",
     "build": "npx tsc",
     "prepublishOnly": "npm run build && npm test"
   },
@@ -28,13 +28,14 @@
   "author": "Antoine Boileau",
   "license": "ISC",
   "devDependencies": {
-    "@types/chai": "^4.3.20",
-    "@types/chai-as-promised": "^7.1.8",
+    "@types/chai": "^5.2.3",
+    "@types/chai-as-promised": "^8.0.2",
     "@types/mocha": "^10.0.10",
+    "@types/node": "^26.1.1",
     "@typescript-eslint/eslint-plugin": "^8.63.0",
     "@typescript-eslint/parser": "^8.63.0",
-    "chai": "^4.5.0",
-    "chai-as-promised": "^7.1.2",
+    "chai": "^6.2.2",
+    "chai-as-promised": "^8.0.2",
     "eslint": "^8.57.1",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.32.0",

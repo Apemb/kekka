@@ -18,12 +18,12 @@ npm run lint             # eslint --fix over src/ and test/
 npm run build            # tsc → dist/ (emits .js + .d.ts)
 
 # run a single test file
-npx mocha --require tsx/cjs test/optional.test.ts
+npx mocha --node-option import=tsx --extension ts test/optional.test.ts
 # run tests matching a description
-npx mocha --recursive --require tsx/cjs 'test/**/*.test.ts' --grep "merge"
+npx mocha --recursive --node-option import=tsx --extension ts 'test/**/*.test.ts' --grep "merge"
 ```
 
-Node version is pinned via `.tool-versions` (asdf). Tests run TypeScript directly through `tsx` (esbuild) — no compile needed. `tsx` transpiles without type-checking, so type errors surface via `npm run build` / `tsc`, not the test run.
+Node version is pinned via `.tool-versions` (asdf). Mocha loads tests through `tsx`'s ESM loader (`--node-option import=tsx`), which transpiles TypeScript via esbuild and handles the ESM-only test deps (chai 6). `tsx` does **not** type-check, so type errors surface via `npm run build` / `tsc`, not the test run — and the `test/` dir is excluded from `tsconfig`, so tests are only type-checked in-editor.
 
 ## Architecture
 
@@ -44,6 +44,6 @@ Constructors are private. Build only through static factories (`Result.fromSucce
 These methods are declared to TypeScript via `declare module` / `declare global`, so the **types always claim they exist**, but at runtime they only exist if the side-effect module was loaded. Consequence: importing from `./src/result` or `./src/optional` directly (as some tests do) gives you objects whose `toOptional`/`toResult`/promise helpers are `undefined` at runtime despite typechecking. Always go through the package entry (`index.ts`) when those cross-type helpers are needed.
 
 ## Testing conventions
-- Mocha + Chai (`expect` BDD style) + `chai-as-promised`, wired in `test/test-helper.ts`.
+- Mocha + Chai (`expect` BDD style) + `chai-as-promised`, wired in `test/test-helper.ts`. Chai 6 is ESM-only with named exports — import as `import { use, expect } from 'chai'`, not a default import.
 - Chai assertions like `expect(x).to.be.true` are property expressions, so `test/.eslintrc` disables both `no-unused-expressions` and `@typescript-eslint/no-unused-expressions`.
 - Tests that exercise the side-effect extensions must load them with a **static** side-effect import (`import '../src/result-promise-extension'`), never a floating `import(...)` — under `tsx` the dynamic form resolves too late and the prototype patch isn't applied when the test runs.
