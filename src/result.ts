@@ -1,3 +1,5 @@
+import { Optional } from './optional'
+
 /**
  * Instead of relying on `result instanceof Result` Kekka will rely on KEKKA_API_VERSION to determine if the
  * object is a Result object and can be processed as such.
@@ -87,6 +89,13 @@ export class Result<Value> {
     } else {
       return this
     }
+  }
+
+  toOptional (): Optional<Value> {
+    if (this.isFailure()) {
+      return Optional.empty<Value>()
+    }
+    return Optional.ofNullable(this.unwrap())
   }
 
   toString (): string {

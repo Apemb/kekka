@@ -36,14 +36,13 @@ Node version is pinned via `.tool-versions` (asdf). Mocha loads tests through `t
 ### Construction
 Constructors are private. Build only through static factories (`Result.fromSuccess`/`fromFailure`, `Optional.of`/`empty`/`ofNullable`) or their exported aliases (`Success`, `Failure`, `Some`, `Empty`). `unwrap()` returns the value on success and **throws** the stored error on failure.
 
-### Side-effect extension modules (important gotcha)
-`index.ts` imports two modules purely for their side effects:
-- `src/result-promise-extension.ts` — monkey-patches the **global** `Promise.prototype` with `thenOnSuccess`/`thenOnFailure` and adds `Promise.resolveFromSuccess`/`resolveFromFailure`. Opt-in: it only activates once the package is imported.
-- `src/result-optional-extension.ts` — augments the `Result`/`Optional` prototypes with `toOptional()`/`toResult()`.
+### Cross-type conversion and the circular import
+`Result.toOptional()` and `Optional.toResult()` are **real instance methods** on their classes, so `result.ts` and `optional.ts` import each other. This circular import is safe because each side only references the other **inside a method body** (call time), never at module load / top-level. Do not add a top-level `export const X = OtherClass.something` referencing the other module — that would evaluate during load, when the other class is still undefined, and break.
 
-These methods are declared to TypeScript via `declare module` / `declare global`, so the **types always claim they exist**, but at runtime they only exist if the side-effect module was loaded. Consequence: importing from `./src/result` or `./src/optional` directly (as some tests do) gives you objects whose `toOptional`/`toResult`/promise helpers are `undefined` at runtime despite typechecking. Always go through the package entry (`index.ts`) when those cross-type helpers are needed.
+### Side-effect extension: global Promise helpers (important gotcha)
+`index.ts` imports `src/result-promise-extension.ts` purely for its side effect: it monkey-patches the **global** `Promise.prototype` with `thenOnSuccess`/`thenOnFailure` and adds `Promise.resolveFromSuccess`/`resolveFromFailure`. Declared to TypeScript via `declare global`, so the **types always claim these exist**, but at runtime they only exist once the package (or that module) has been imported. Importing from `./src/result` directly, without loading the extension, gives you Promises whose helpers are `undefined` despite typechecking.
 
 ## Testing conventions
 - Mocha + Chai (`expect` BDD style) + `chai-as-promised`, wired in `test/test-helper.ts`. Chai 6 is ESM-only with named exports — import as `import { use, expect } from 'chai'`, not a default import.
 - Chai assertions like `expect(x).to.be.true` are property expressions, so the `test/**/*.ts` override in `eslint.config.mjs` (flat config, ESLint 10) disables both `no-unused-expressions` and `@typescript-eslint/no-unused-expressions`.
-- Tests that exercise the side-effect extensions must load them with a **static** side-effect import (`import '../src/result-promise-extension'`), never a floating `import(...)` — under `tsx` the dynamic form resolves too late and the prototype patch isn't applied when the test runs.
+- Tests that exercise the Promise helpers must load the extension with a **static** side-effect import (`import '../src/result-promise-extension'`), never a floating `import(...)` — under `tsx` the dynamic form resolves too late and the prototype patch isn't applied when the test runs.

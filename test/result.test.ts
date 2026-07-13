@@ -1,5 +1,6 @@
 import { expect } from './test-helper'
 import { Result, Success, Failure, isResult } from '../src/result'
+import { isOptional } from '../src/optional'
 
 describe('result', () => {
   describe('isSuccess', () => {
@@ -197,6 +198,38 @@ describe('result', () => {
 
       expect(returnedResult.isSuccess()).to.be.true
       expect(returnedResult.unwrap()).to.equal(value)
+    })
+  })
+
+  describe('toOptional', () => {
+    it('should return Some with value if Result is Success with not undef or null value', () => {
+      const value = 'some value'
+      const result = Success(value)
+
+      const optional = result.toOptional()
+
+      expect(isOptional(optional)).to.be.true
+      expect(optional.orElse('another value')).to.equal(value)
+    })
+
+    it('should return Empty if Result is a Failure', () => {
+      const error = new Error('some error')
+      const result = Failure(error)
+
+      const optional = result.toOptional()
+
+      expect(isOptional(optional)).to.be.true
+      expect(optional.isEmpty()).to.be.true
+    })
+
+    it('should return Empty with value if Result is Success with undef or null value', () => {
+      const value = null
+      const result = Success(value)
+
+      const optional = result.toOptional()
+
+      expect(isOptional(optional)).to.be.true
+      expect(optional.isEmpty()).to.be.true
     })
   })
 })
