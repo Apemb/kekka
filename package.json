@@ -17,7 +17,7 @@
   },
   "scripts": {
     "lint": "eslint  src/**.ts test/**.ts --fix",
-    "test": "mocha --recursive --exit --require ts-node/register 'test/**/*.test.ts'",
+    "test": "mocha --recursive --exit --require tsx/cjs 'test/**/*.test.ts'",
     "build": "npx tsc",
     "prepublishOnly": "npm run build && npm test"
   },
@@ -41,7 +41,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.6.0",
     "mocha": "^11.7.6",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.23.1",
     "typescript": "^5.9.3"
   }
 }

@@ -18,12 +18,12 @@ npm run lint             # eslint --fix over src/ and test/
 npm run build            # tsc → dist/ (emits .js + .d.ts)
 
 # run a single test file
-npx mocha --require ts-node/register test/optional.test.ts
+npx mocha --require tsx/cjs test/optional.test.ts
 # run tests matching a description
-npx mocha --recursive --require ts-node/register 'test/**/*.test.ts' --grep "merge"
+npx mocha --recursive --require tsx/cjs 'test/**/*.test.ts' --grep "merge"
 ```
 
-Node version is pinned via `.tool-versions` (asdf). Tests run TypeScript directly through `ts-node/register` — no compile needed to test.
+Node version is pinned via `.tool-versions` (asdf). Tests run TypeScript directly through `tsx` (esbuild) — no compile needed. `tsx` transpiles without type-checking, so type errors surface via `npm run build` / `tsc`, not the test run.
 
 ## Architecture
 
@@ -46,3 +46,4 @@ These methods are declared to TypeScript via `declare module` / `declare global`
 ## Testing conventions
 - Mocha + Chai (`expect` BDD style) + `chai-as-promised`, wired in `test/test-helper.ts`.
 - Chai assertions like `expect(x).to.be.true` are property expressions, so `test/.eslintrc` disables both `no-unused-expressions` and `@typescript-eslint/no-unused-expressions`.
+- Tests that exercise the side-effect extensions must load them with a **static** side-effect import (`import '../src/result-promise-extension'`), never a floating `import(...)` — under `tsx` the dynamic form resolves too late and the prototype patch isn't applied when the test runs.

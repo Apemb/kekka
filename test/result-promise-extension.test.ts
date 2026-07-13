@@ -1,7 +1,7 @@
 import {expect} from './test-helper'
 import {Result, Success, Failure} from '../src/result'
 
-import('../src/result-promise-extension')
+import '../src/result-promise-extension'
 
 describe('result promise', () => {
   describe('thenOnSuccess', () => {

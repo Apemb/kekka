@@ -1,6 +1,6 @@
 import {expect} from './test-helper'
 
-import('../src/result-optional-extension')
+import '../src/result-optional-extension'
 import {Empty, isOptional, Some} from '../src/optional'
 import {Success, Failure} from '../src/result'
 
