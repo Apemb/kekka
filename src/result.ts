@@ -61,7 +61,7 @@ export class Result<Value> {
     return this._value as Value
   }
 
-  onSuccess<NextValue> (callback: (value: Value) => NextValue | Result<NextValue>): Result<NextValue | Value> {
+  onSuccess<NextValue> (callback: (value: Value) => NextValue | Result<NextValue>): Result<NextValue> {
     if (this.isSuccess()) {
       const returnedValue: NextValue | Result<NextValue> = callback(this._value as Value)
 
@@ -71,7 +71,7 @@ export class Result<Value> {
         return Result.fromSuccess(returnedValue as NextValue)
       }
     } else {
-      return this
+      return this as unknown as Result<NextValue>
     }
   }
 
@@ -112,8 +112,9 @@ export class Result<Value> {
   }
 }
 
-export function isResult(obj: any | null | undefined): obj is Result<never> {
-  return !(obj === undefined || obj === null) && obj.kekkaPublicApiVersion === KEKKA_API_VERSION
+export function isResult(obj: unknown): obj is Result<never> {
+  return !(obj === undefined || obj === null) &&
+    (obj as { kekkaPublicApiVersion?: unknown }).kekkaPublicApiVersion === KEKKA_API_VERSION
 }
 
 export const Success = Result.fromSuccess

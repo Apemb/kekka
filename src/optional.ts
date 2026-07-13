@@ -106,8 +106,9 @@ export class Optional<Value> {
   }
 }
 
-export function isOptional(obj: any): obj is Optional<never> {
-  return !(obj === undefined || obj === null) && obj.kekkaOptionalPublicApiVersion === KEKKA_OPTIONAL_API_VERSION
+export function isOptional(obj: unknown): obj is Optional<never> {
+  return !(obj === undefined || obj === null) &&
+    (obj as { kekkaOptionalPublicApiVersion?: unknown }).kekkaOptionalPublicApiVersion === KEKKA_OPTIONAL_API_VERSION
 }
 
 export const Some = Optional.of
