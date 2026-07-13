@@ -237,4 +237,8 @@ describe('isOptional', () => {
   it('should be false if value is null', () => {
     expect(isOptional(null)).to.be.false
   })
+
+  it('should be false if obj only mimics the api version without the methods', () => {
+    expect(isOptional({ kekkaOptionalPublicApiVersion: 4 })).to.be.false
+  })
 })

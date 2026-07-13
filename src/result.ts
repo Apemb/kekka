@@ -32,20 +32,16 @@ export class Result<Value> {
   }
 
   /*
-  Cannot use reduce, since reduce in Typescript assume that you work on an array of elements all having the same type
+  Merges an array of Results into a single Result of an array. Keeps the first failure encountered.
+  The explicit reduce accumulator type is needed because TypeScript infers it from the seed otherwise.
    */
-  static merge<Value>  (results: Result<Value>[]): Result<Value[]> | Result<Value> {
-    return results.reduce((resultOfMerge: Result<Value> | Result<Value[]>, currentResult: Result<Value>) => {
-      if (currentResult.isSuccess()) {
-        return (resultOfMerge as Result<Value[]>).onSuccess( (mergedResultValues) => {
-            mergedResultValues.push(currentResult.unwrap())
-          return mergedResultValues
-        })
-      } else if (currentResult.isFailure() && resultOfMerge.isSuccess()) {
-        return currentResult
+  static merge<Value> (results: Result<Value>[]): Result<Value[]> {
+    return results.reduce<Result<Value[]>>((resultOfMerge, currentResult) => {
+      if (currentResult.isFailure()) {
+        return resultOfMerge.isFailure() ? resultOfMerge : (currentResult as unknown as Result<Value[]>)
       }
-      return resultOfMerge
-    }, Result.fromSuccess([]))
+      return resultOfMerge.onSuccess((mergedResultValues) => [...mergedResultValues, currentResult.unwrap()])
+    }, Result.fromSuccess<Value[]>([]))
   }
 
   isSuccess (): boolean {
@@ -122,8 +118,12 @@ export class Result<Value> {
 }
 
 export function isResult(obj: unknown): obj is Result<never> {
-  return !(obj === undefined || obj === null) &&
-    (obj as { kekkaPublicApiVersion?: unknown }).kekkaPublicApiVersion === KEKKA_API_VERSION
+  if (obj === undefined || obj === null) {
+    return false
+  }
+  const candidate = obj as { kekkaPublicApiVersion?: unknown, isSuccess?: unknown }
+  return candidate.kekkaPublicApiVersion === KEKKA_API_VERSION &&
+    typeof candidate.isSuccess === 'function'
 }
 
 export const Success = Result.fromSuccess

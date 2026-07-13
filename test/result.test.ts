@@ -273,4 +273,8 @@ describe('isResult', () => {
   it('should be false if value is null', () => {
     expect(isResult(null)).to.be.false
   })
+
+  it('should be false if obj only mimics the api version without the methods', () => {
+    expect(isResult({ kekkaPublicApiVersion: 4 })).to.be.false
+  })
 })
