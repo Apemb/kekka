@@ -54,6 +54,11 @@ Look out for the [`Optional` class](docs/optional.md)
 
 ## Changelog
 
+- v4.1: Ship working TypeScript types and internal cleanups
+  - Fix package `types` entry so type definitions now resolve for consumers
+  - `toOptional` / `toResult` are now always-available instance methods (no extension import needed)
+  - `Result.merge` returns `Result<Value[]>` and no longer mutates its input
+  - Stricter `isResult` / `isOptional` type guards
 - v4.0: Add Optional Object
 - v3.0: Fix broken import from different modules in mono-repo
 - v2.0: Transcription to Typescript
