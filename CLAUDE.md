@@ -13,17 +13,28 @@ The published package (`main`/`types` → `dist/`) is the compiled output; sourc
 ## Commands
 
 ```bash
-npm test                 # run the full mocha suite (ts-node, no build step)
+npm test                 # run the full vitest suite (no build step)
+npm run test:watch       # vitest in watch mode
 npm run lint             # eslint --fix over src/ and test/
 npm run build            # tsc → dist/ (emits .js + .d.ts)
 
 # run a single test file
-npx mocha --node-option import=tsx --extension ts test/optional.test.ts
+npx vitest run test/optional.test.ts
 # run tests matching a description
-npx mocha --recursive --node-option import=tsx --extension ts 'test/**/*.test.ts' --grep "merge"
+npx vitest run -t "merge"
 ```
 
-Node version is pinned via `.tool-versions` (asdf). Mocha loads tests through `tsx`'s ESM loader (`--node-option import=tsx`), which transpiles TypeScript via esbuild and handles the ESM-only test deps (chai 6). `tsx` does **not** type-check, so type errors surface via `npm run build` / `tsc`, not the test run — and the `test/` dir is excluded from `tsconfig`, so tests are only type-checked in-editor.
+Node version is pinned via `.tool-versions` (mise). Vitest transpiles TypeScript through esbuild and does **not** type-check, so type errors surface via `npm run build` / `tsc`, not the test run.
+
+### Two tsconfigs, on purpose
+
+`tsconfig.json` is the **build** scope: what it includes is what `tsc` emits into `dist/`, which is why `test/` is excluded from it. `tsconfig.eslint.json` is the **lint** scope, widened to cover `test/` and `vitest.config.ts`, because the type-aware ESLint rules need type information for every file they lint. Adding `test/` to the build tsconfig instead would ship the tests into `dist/`.
+
+### The runner config lives in `vitest.config.ts`
+
+It holds nothing but `include: ['test/**/*.test.ts']`. Globals are deliberately **not** enabled: every test file imports `describe` / `it` / `expect` from `vitest` explicitly.
+
+IntelliJ detects Vitest from `package.json` and produces run configurations for a test, a suite, a file **or a directory**. That last one matters: the Mocha producer this project used before never claimed directories, so `Ctrl+Shift+R` on `test/` fell through to whichever other plugin answered — the Python plugin, on a project without a line of Python.
 
 ## Architecture
 
@@ -43,6 +54,8 @@ Constructors are private. Build only through static factories (`Result.fromSucce
 `index.ts` imports `src/result-promise-extension.ts` purely for its side effect: it monkey-patches the **global** `Promise.prototype` with `thenOnSuccess`/`thenOnFailure` and adds `Promise.resolveFromSuccess`/`resolveFromFailure`. Declared to TypeScript via `declare global`, so the **types always claim these exist**, but at runtime they only exist once the package (or that module) has been imported. Importing from `./src/result` directly, without loading the extension, gives you Promises whose helpers are `undefined` despite typechecking.
 
 ## Testing conventions
-- Mocha + Chai (`expect` BDD style) + `chai-as-promised`, wired in `test/test-helper.ts`. Chai 6 is ESM-only with named exports — import as `import { use, expect } from 'chai'`, not a default import.
-- Chai assertions like `expect(x).to.be.true` are property expressions, so the `test/**/*.ts` override in `eslint.config.mjs` (flat config, ESLint 10) disables both `no-unused-expressions` and `@typescript-eslint/no-unused-expressions`.
-- Tests that exercise the Promise helpers must load the extension with a **static** side-effect import (`import '../src/result-promise-extension'`), never a floating `import(...)` — under `tsx` the dynamic form resolves too late and the prototype patch isn't applied when the test runs.
+- Vitest with Jest-style matchers (`toBe`, `toStrictEqual`, `toThrow`, `resolves`). `describe` / `it` / `expect` are imported from `vitest` in each file.
+- `test/test-helper.ts` exposes a single helper, `thrownBy(fn)`, which returns the thrown error so it can be compared **by identity**. `expect(fn).toThrow(error)` only compares the *message*, which makes two distinct errors with the same wording interchangeable — and the `Result.merge` test deliberately builds two errors carrying the identical message `'First error'` to prove the *first* one comes back. Use `thrownBy` wherever the identity of the error is the point; plain `toThrow('…')` is fine when only the message matters.
+- Async assertions must be awaited (`await expect(p).resolves.…`). This is enforced by **`@typescript-eslint/no-floating-promises`**, and only by it: Vitest 4 auto-awaits a pending assertion and merely warns on stderr, so the suite still exits 0, and `no-unused-expressions` never sees the problem since `expect(p).resolves.toBe(x)` ends in a call. Two assertions in `optional.test.ts` had silently never run for exactly that reason. Note the `test/**` override disabling `no-unused-expressions` was dropped for an unrelated reason — Chai's bare member expression `expect(x).to.be.true` is gone.
+- Comparing errors: use `thrownBy(...)` with `toBe` whenever the *identity* of an object is the contract — a returned `Result` that must be the receiver itself, an `Error` handed to a callback, the failure `merge` picks. `toStrictEqual` compares `Error`s by message and `toThrow` does too, so both accept a look-alike copy.
+- Tests that exercise the Promise helpers must load the extension with a **static** side-effect import (`import '../src/result-promise-extension'`), never a floating `import(...)` — the dynamic form resolves too late and the prototype patch isn't applied when the test runs.

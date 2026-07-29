@@ -1,4 +1,5 @@
-import { expect } from './test-helper'
+import { describe, it, expect } from 'vitest'
+import { thrownBy } from './test-helper'
 import { Result, Success, Failure, isResult } from '../src/result'
 import { isOptional } from '../src/optional'
 
@@ -8,14 +9,14 @@ describe('result', () => {
       const value = 'some value'
       const successfulResult = Success(value)
 
-      expect(successfulResult.isSuccess()).to.be.true
+      expect(successfulResult.isSuccess()).toBe(true)
     })
 
     it('should be false if result is a failure', () => {
       const value = new Error('Some error')
       const failedResult = Failure(value)
 
-      expect(failedResult.isSuccess()).to.be.false
+      expect(failedResult.isSuccess()).toBe(false)
     })
   })
 
@@ -24,14 +25,14 @@ describe('result', () => {
       const value = 'some value'
       const successfulResult = Success(value)
 
-      expect(successfulResult.isFailure()).to.be.false
+      expect(successfulResult.isFailure()).toBe(false)
     })
 
     it('should be true if result is a failure', () => {
       const value = new Error('Some error')
       const failedResult = Failure(value)
 
-      expect(failedResult.isFailure()).to.be.true
+      expect(failedResult.isFailure()).toBe(true)
     })
   })
 
@@ -40,13 +41,13 @@ describe('result', () => {
       const value = 'some value'
       const successfulResult = Success(value)
 
-      expect(successfulResult.unwrap()).to.equal(value)
+      expect(successfulResult.unwrap()).toBe(value)
     })
 
     it('should return undefined if result is a success without any value', () => {
       const successfulResult = Success()
 
-      expect(successfulResult.unwrap()).to.equal(undefined)
+      expect(successfulResult.unwrap()).toBeUndefined()
     })
 
     it('should throw the failure error if result is a failure', () => {
@@ -54,7 +55,7 @@ describe('result', () => {
       const failedResult = Failure(value)
       const unwrapFunction = () => failedResult.unwrap()
 
-      expect(unwrapFunction).to.throw(value)
+      expect(thrownBy(unwrapFunction)).toBe(value)
     })
   })
 
@@ -67,8 +68,8 @@ describe('result', () => {
 
       const mergedResult = Result.merge(arrayOfSuccessResult)
 
-      expect(mergedResult.isSuccess()).to.be.true
-      expect(mergedResult.unwrap()).to.deep.equal(['some', 'value'])
+      expect(mergedResult.isSuccess()).toBe(true)
+      expect(mergedResult.unwrap()).toStrictEqual(['some', 'value'])
     })
 
     it('should return the first failure if one or more items in array is a failure', () => {
@@ -85,8 +86,9 @@ describe('result', () => {
       const mergedResultFailure = Result.merge(arrayOfFailureResult)
       const unwrapFunction = () => mergedResultFailure.unwrap()
 
-      expect(mergedResultFailure.isFailure()).to.be.true
-      expect(unwrapFunction).to.throw(firstError)
+      expect(mergedResultFailure.isFailure()).toBe(true)
+      // Les deux erreurs portent le même message : seule l'identité distingue la première.
+      expect(thrownBy(unwrapFunction)).toBe(firstError)
     })
   })
 
@@ -99,8 +101,8 @@ describe('result', () => {
         return Success(receivedValue + ' and more')
       })
 
-      expect(returnedResult.isSuccess()).to.be.true
-      expect(returnedResult.unwrap()).to.equal('some value and more')
+      expect(returnedResult.isSuccess()).toBe(true)
+      expect(returnedResult.unwrap()).toBe('some value and more')
     })
 
     it('should wrap result in success if callback returns anything other than result', () => {
@@ -111,8 +113,8 @@ describe('result', () => {
         return receivedValue + ' and more'
       })
 
-      expect(returnedResult.isSuccess()).to.be.true
-      expect(returnedResult.unwrap()).to.equal('some value and more')
+      expect(returnedResult.isSuccess()).toBe(true)
+      expect(returnedResult.unwrap()).toBe('some value and more')
     })
 
     it('should return failedResult in callback return a failure', () => {
@@ -123,11 +125,11 @@ describe('result', () => {
         return Result.fromFailure(new Error(receivedValue + ' and more'))
       })
 
-      expect(returnedResult.isSuccess()).to.be.false
-      expect(returnedResult.isFailure()).to.be.true
+      expect(returnedResult.isSuccess()).toBe(false)
+      expect(returnedResult.isFailure()).toBe(true)
 
       const unwrapFunction = () => returnedResult.unwrap()
-      expect(unwrapFunction).to.throw('some value and more')
+      expect(unwrapFunction).toThrow('some value and more')
     })
 
     it('should return itself if called on a failedResult', () => {
@@ -138,11 +140,13 @@ describe('result', () => {
         return Result.fromSuccess('Success')
       })
 
-      expect(returnedResult.isSuccess()).to.be.false
-      expect(returnedResult.isFailure()).to.be.true
+      // « itself » au sens strict : une nouvelle Failure portant la même erreur ne suffit pas.
+      expect(returnedResult).toBe(failedResult)
+      expect(returnedResult.isSuccess()).toBe(false)
+      expect(returnedResult.isFailure()).toBe(true)
 
       const unwrapFunction = () => returnedResult.unwrap()
-      expect(unwrapFunction).to.throw(value)
+      expect(thrownBy(unwrapFunction)).toBe(value)
     })
   })
 
@@ -155,8 +159,8 @@ describe('result', () => {
         return Result.fromSuccess(receivedError.message + ' is now saved')
       })
 
-      expect(returnedResult.isSuccess()).to.be.true
-      expect(returnedResult.unwrap()).to.equal('Some error is now saved')
+      expect(returnedResult.isSuccess()).toBe(true)
+      expect(returnedResult.unwrap()).toBe('Some error is now saved')
     })
 
     it('should wrap result in success if callback returns anything other than result', () => {
@@ -167,8 +171,8 @@ describe('result', () => {
         return receivedError.message + ' is now saved'
       })
 
-      expect(returnedResult.isSuccess()).to.be.true
-      expect(returnedResult.unwrap()).to.equal('Some error is now saved')
+      expect(returnedResult.isSuccess()).toBe(true)
+      expect(returnedResult.unwrap()).toBe('Some error is now saved')
     })
 
     it('should return failedResult in callback return a failure', () => {
@@ -181,11 +185,11 @@ describe('result', () => {
         )
       })
 
-      expect(returnedResult.isSuccess()).to.be.false
-      expect(returnedResult.isFailure()).to.be.true
+      expect(returnedResult.isSuccess()).toBe(false)
+      expect(returnedResult.isFailure()).toBe(true)
 
       const unwrapFunction = () => returnedResult.unwrap()
-      expect(unwrapFunction).to.throw('Some error is now failed again')
+      expect(unwrapFunction).toThrow('Some error is now failed again')
     })
 
     it('should return itself if called on a successResult', () => {
@@ -196,8 +200,10 @@ describe('result', () => {
         return Result.fromSuccess('Success')
       })
 
-      expect(returnedResult.isSuccess()).to.be.true
-      expect(returnedResult.unwrap()).to.equal(value)
+      // « itself » au sens strict : un nouveau Success portant la même valeur ne suffit pas.
+      expect(returnedResult).toBe(successfulResult)
+      expect(returnedResult.isSuccess()).toBe(true)
+      expect(returnedResult.unwrap()).toBe(value)
     })
   })
 
@@ -208,8 +214,8 @@ describe('result', () => {
 
       const optional = result.toOptional()
 
-      expect(isOptional(optional)).to.be.true
-      expect(optional.orElse('another value')).to.equal(value)
+      expect(isOptional(optional)).toBe(true)
+      expect(optional.orElse('another value')).toBe(value)
     })
 
     it('should return Empty if Result is a Failure', () => {
@@ -218,8 +224,8 @@ describe('result', () => {
 
       const optional = result.toOptional()
 
-      expect(isOptional(optional)).to.be.true
-      expect(optional.isEmpty()).to.be.true
+      expect(isOptional(optional)).toBe(true)
+      expect(optional.isEmpty()).toBe(true)
     })
 
     it('should return Empty with value if Result is Success with undef or null value', () => {
@@ -228,8 +234,8 @@ describe('result', () => {
 
       const optional = result.toOptional()
 
-      expect(isOptional(optional)).to.be.true
-      expect(optional.isEmpty()).to.be.true
+      expect(isOptional(optional)).toBe(true)
+      expect(optional.isEmpty()).toBe(true)
     })
   })
 })
@@ -239,42 +245,42 @@ describe('isResult', () => {
     const value = 'some value'
     const successfulResult = Success(value)
 
-    expect(isResult(successfulResult)).to.be.true
+    expect(isResult(successfulResult)).toBe(true)
   })
 
   it('should be true if obj is a failure', () => {
     const value = new Error('Some error')
     const failedResult = Failure(value)
 
-    expect(isResult(failedResult)).to.be.true
+    expect(isResult(failedResult)).toBe(true)
   })
 
 
   it('should be false if obj is not a result', () => {
     const someObject = {a: 'test'}
 
-    expect(isResult(someObject)).to.be.false
+    expect(isResult(someObject)).toBe(false)
   })
 
   it('should be false if obj is a string or an integer', () => {
-    expect(isResult('a string')).to.be.false
-    expect(isResult(31)).to.be.false
+    expect(isResult('a string')).toBe(false)
+    expect(isResult(31)).toBe(false)
   })
 
   it('should be false if obj is a bool', () => {
-    expect(isResult(true)).to.be.false
-    expect(isResult(false)).to.be.false
+    expect(isResult(true)).toBe(false)
+    expect(isResult(false)).toBe(false)
   })
 
   it('should be false if value is undefined', () => {
-    expect(isResult(undefined)).to.be.false
+    expect(isResult(undefined)).toBe(false)
   })
 
   it('should be false if value is null', () => {
-    expect(isResult(null)).to.be.false
+    expect(isResult(null)).toBe(false)
   })
 
   it('should be false if obj only mimics the api version without the methods', () => {
-    expect(isResult({ kekkaPublicApiVersion: 4 })).to.be.false
+    expect(isResult({ kekkaPublicApiVersion: 4 })).toBe(false)
   })
 })

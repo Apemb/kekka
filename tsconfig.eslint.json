@@ -1,0 +1,13 @@
+// Périmètre du lint, plus large que celui du build.
+//
+// `tsconfig.json` exclut `test/` à dessein : ce qu'il inclut est ce que `tsc` émet dans `dist/`.
+// Mais `@typescript-eslint/no-floating-promises` a besoin des types, donc d'un projet qui couvre
+// les fichiers lintés — tests compris, puisque c'est précisément là que l'on oublie un `await`.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src/**/*", "index.ts", "test/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}
